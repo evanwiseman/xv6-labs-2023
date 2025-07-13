@@ -5,8 +5,6 @@
 int
 main(int argc, char **argv)
 {
-  int i;
-
   if(argc != 2){
     fprintf(2, "error: invalid arguments\n");
     exit(1);
