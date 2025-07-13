@@ -27,7 +27,7 @@ main(int argc, char **argv)
       exit(0);  // no numbers to read
     }
 
-    printf("prime %d\n", val);
+    //printf("prime %d\n", val);
 
     int right_pipe[2];
     pipe(right_pipe);
@@ -37,8 +37,8 @@ main(int argc, char **argv)
       close(right_pipe[0]); // close read end of right_pipe
       int num;
       while((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
-        printf("num=%d\n", num);
         if (num % val != 0) { // num is prime
+          printf("num=%d\n", num);
           write(right_pipe[1], &num, sizeof(int));
         }
       }
