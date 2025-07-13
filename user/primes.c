@@ -2,63 +2,76 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 
-int
-main(int argc, char **argv)
-{
-  int left_pipe[2];
-  pipe(left_pipe);
+// Filter logic: reads from input_fd, filters, and spawns next stage
+void
+filter(int input_fd) {
+  int prime, n;
+
+  if ((n = read(input_fd, &prime, sizeof(int))) != sizeof(int)) {
+    close(input_fd);
+    exit(0);
+  }
+
+  printf("prime %d\n", prime);
+
+  int p[2];
+  pipe(p);
 
   int pid = fork();
   if (pid > 0) {
-    close(left_pipe[0]);  // close read end of left_pipe
-    for (int i = 2; i <= 35; i++) {
-      write(left_pipe[1], &i, sizeof(int));
+    // Parent: filter numbers and write to next pipe
+    close(p[0]);
+    int num;
+    while ((n = read(input_fd, &num, sizeof(int))) == sizeof(int)) {
+      if (num % prime != 0) {
+        write(p[1], &num, sizeof(int));
+      }
     }
-    close(left_pipe[1]);  // done writing
+    close(input_fd);
+    close(p[1]);
     wait(0);
+    exit(0);
   } else {
-    close(left_pipe[1]);  // close the write end of left_pipe
+    // Child: prepare for exec with next pipe as stdin
+    close(p[1]);
+    close(input_fd);
 
-    int prime;
-    int n;
+    // Redirect p[0] → fd 0
+    close(0);
+    dup(p[0]);
+    close(p[0]);
 
-    if ((n = read(left_pipe[0], &prime, sizeof(int))) != sizeof(int)) { 
-      close(left_pipe[0]);
-      exit(0);
-    }
+    char *args[] = {"sieve", "child", 0};
+    exec(args[0], args);
+    fprintf(2, "exec failed\n");
+    exit(1);
+  }
+}
 
-    printf("prime %d\n", prime);
-
-    int right_pipe[2];
-    pipe(right_pipe);
+int
+main(int argc, char **argv) {
+  if (argc == 1) {
+    // Initial parent: generate numbers 2..35
+    int p[2];
+    pipe(p);
 
     int pid = fork();
     if (pid > 0) {
-      close(right_pipe[0]);
-      
-      int num;
-      while ((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
-        if (num % prime != 0) {
-          write(right_pipe[1], &num, sizeof(int));
-        }
+      close(p[0]);
+      for (int i = 2; i <= 35; i++) {
+        write(p[1], &i, sizeof(int));
       }
-      close(left_pipe[0]);
-      close(right_pipe[1]);
+      close(p[1]);
       wait(0);
+      exit(0);
     } else {
-      close(left_pipe[0]);
-      close(left_pipe[1]);
-
-      close(0);
-      dup(right_pipe[0]);
-      close(right_pipe[0]);
-
-      exec(argv[0], argv);
-      
-      fprintf(2, "exec failed\n");
-      exit(1);
+      close(p[1]);
+      filter(p[0]);
     }
+  } else {
+    // Re-exec’d children: read from stdin (which was dup’d from pipe)
+    filter(0);
   }
-  
+
   exit(0);
 }
