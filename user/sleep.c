@@ -8,7 +8,7 @@ main(int argc, char **argv)
   int i;
 
   if(argc != 2){
-    fprintf(2, "usage: sleep...\n");
+    fprintf(2, "error: invalid arguments\n");
     exit(1);
   }
   sleep(atoi(argv[1]));
