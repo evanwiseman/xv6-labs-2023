@@ -10,7 +10,6 @@ main(int argc, char **argv)
 
   int pid = fork();
   if (pid > 0) {
-    printf("writing to left_pipe...\n");
     close(left_pipe[0]);  // close read end of left_pipe
     for (int i = 2; i <= 35; i++) {
       write(left_pipe[1], &i, sizeof(int));
@@ -27,6 +26,8 @@ main(int argc, char **argv)
       close(left_pipe[0]);
       exit(0);  // no numbers to read
     }
+
+    printf("prime %d", val);
 
     int right_pipe[2];
     pipe(right_pipe);
@@ -47,12 +48,9 @@ main(int argc, char **argv)
       close(right_pipe[1]);  // close write end of right_pipe
       
       // replace left_pipe wiht right_pipe
-      printf("old fd = %d", left_pipe);
       close(left_pipe[0]);
-      dup(right_pipe[0]);
+      left_pipe[0] = dup(right_pipe[0]);
       close(right_pipe[0]);
-
-      printf("new fd = %d", left_pipe);
 
       exec(argv[0], argv);
     }
