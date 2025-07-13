@@ -19,26 +19,26 @@ main(int argc, char **argv)
   } else {
     close(left_pipe[1]);  // close the write end of left_pipe
 
-    int val;  // first prime
-    int n;    // read result
-    
-    if ((n = read(left_pipe[0], &val, sizeof(int))) != sizeof(int)) {
+    int prime;
+    int n;
+
+    if ((n = read(left_pipe[0], &prime, sizeof(int))) != sizeof(int)) { 
       close(left_pipe[0]);
-      exit(0);  // no numbers to read
+      exit(0);
     }
 
-    //printf("prime %d\n", val);
+    printf("prime %d\n", prime);
 
     int right_pipe[2];
     pipe(right_pipe);
 
     int pid = fork();
     if (pid > 0) {
-      close(right_pipe[0]); // close read end of right_pipe
+      close(right_pipe[0]);
+      
       int num;
-      while((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
-        if (num % val != 0) { // num is prime
-          printf("num=%d\n", num);
+      while ((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
+        if (num % prime != 0) {
           write(right_pipe[1], &num, sizeof(int));
         }
       }
@@ -46,13 +46,17 @@ main(int argc, char **argv)
       close(right_pipe[1]);
       wait(0);
     } else {
-      // replace left_pipe wiht right_pipe
       close(left_pipe[0]);
+      close(left_pipe[1]);
+
+      close(0);
       dup(right_pipe[0]);
       close(right_pipe[0]);
-      close(right_pipe[1]); 
 
       exec(argv[0], argv);
+      
+      fprintf(2, "exec failed\n");
+      exit(1);
     }
   }
   
