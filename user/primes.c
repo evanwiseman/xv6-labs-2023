@@ -47,12 +47,12 @@ main(int argc, char **argv)
       close(right_pipe[1]);  // close write end of right_pipe
       
       // replace left_pipe wiht right_pipe
-      print("old fd = %d", left_pipe);
+      printf("old fd = %d", left_pipe);
       close(left_pipe[0]);
       dup(right_pipe[0]);
       close(right_pipe[0]);
 
-      print("new fd = %d", left_pipe);
+      printf("new fd = %d", left_pipe);
 
       exec(argv[0], argv);
     }
