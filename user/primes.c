@@ -28,14 +28,11 @@ main(int argc, char **argv)
       exit(0);  // no numbers to read
     }
 
-    printf("prime %d\n", val);
-
     int right_pipe[2];
     pipe(right_pipe);
 
     int pid = fork();
     if (pid > 0) {
-      printf("in child...\n");
       close(right_pipe[0]); // close read end of right_pipe
       int num;
       while((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
@@ -47,17 +44,15 @@ main(int argc, char **argv)
       close(right_pipe[1]);
       wait(0);
     } else {
-      printf("in grandchild...\n");
       close(right_pipe[1]);  // close write end of right_pipe
       
       // replace left_pipe wiht right_pipe
+      print("old fd = %d", left_pipe);
       close(left_pipe[0]);
-      int newfd;
-      do {
-        newfd = dup(right_pipe[0]);
-      } while (newfd != left_pipe[0]);
+      dup(right_pipe[0]);
+      close(right_pipe[0]);
 
-      printf("updated fd=%d\n", newfd);
+      print("new fd = %d", left_pipe);
 
       exec(argv[0], argv);
     }
