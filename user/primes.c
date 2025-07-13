@@ -37,6 +37,7 @@ main(int argc, char **argv)
       close(right_pipe[0]); // close read end of right_pipe
       int num;
       while((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
+        print("num=%d\n", num);
         if (num % val != 0) { // num is prime
           write(right_pipe[1], &num, sizeof(int));
         }
@@ -45,12 +46,11 @@ main(int argc, char **argv)
       close(right_pipe[1]);
       wait(0);
     } else {
-      close(right_pipe[1]);  // close write end of right_pipe
-      
       // replace left_pipe wiht right_pipe
       close(left_pipe[0]);
-      left_pipe[0] = dup(right_pipe[0]);
+      dup(right_pipe[0]);
       close(right_pipe[0]);
+      close(right_pipe[1]); 
 
       exec(argv[0], argv);
     }
