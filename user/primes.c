@@ -49,8 +49,11 @@ main(int argc, char **argv)
       close(right_pipe[1]);  // close write end of right_pipe
       
       // replace left_pipe wiht right_pipe
-      dup2(right_pipe[0], left_pipe[0]);
-      close(right_pipe[0]);
+      close(0);             // close stdin
+      dup(right_pipe[0]);   // right_pipe[0] is duplicated as fd 0 (stdin)
+      close(right_pipe[0]); // Clean up original
+      close(left_pipe[0]);  // Clean up left_pipe
+      
       exec(argv[0], argv);
     }
   }
