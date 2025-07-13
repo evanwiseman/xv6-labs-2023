@@ -37,7 +37,7 @@ main(int argc, char **argv)
       close(right_pipe[0]); // close read end of right_pipe
       int num;
       while((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
-        print("num=%d\n", num);
+        printf("num=%d\n", num);
         if (num % val != 0) { // num is prime
           write(right_pipe[1], &num, sizeof(int));
         }
