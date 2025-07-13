@@ -10,6 +10,7 @@ main(int argc, char **argv)
 
   int pid = fork();
   if (pid > 0) {
+    printf("writing to left_pipe...\n");
     close(left_pipe[0]);  // close read end of left_pipe
     for (int i = 2; i <= 35; i++) {
       write(left_pipe[1], &i, sizeof(int));
@@ -21,7 +22,7 @@ main(int argc, char **argv)
 
     int val;  // first prime
     int n;    // read result
-
+    
     if ((n = read(left_pipe[0], &val, sizeof(int))) != sizeof(int)) {
       close(left_pipe[0]);
       exit(0);  // no numbers to read
@@ -34,8 +35,8 @@ main(int argc, char **argv)
 
     int pid = fork();
     if (pid > 0) {
+      printf("in child...\n");
       close(right_pipe[0]); // close read end of right_pipe
-      
       int num;
       while((n = read(left_pipe[0], &num, sizeof(int))) == sizeof(int)) {
         if (num % val != 0) { // num is prime
@@ -46,6 +47,7 @@ main(int argc, char **argv)
       close(right_pipe[1]);
       wait(0);
     } else {
+      printf("in grandchild...\n");
       close(right_pipe[1]);  // close write end of right_pipe
       
       // replace left_pipe wiht right_pipe
@@ -54,6 +56,8 @@ main(int argc, char **argv)
       do {
         newfd = dup(right_pipe[0]);
       } while (newfd != left_pipe[0]);
+
+      printf("updated fd=%d\n", newfd);
 
       exec(argv[0], argv);
     }
