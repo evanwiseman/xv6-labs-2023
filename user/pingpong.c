@@ -24,7 +24,7 @@ main(int argc, char **argv)
     close(p2[0]);             // close child read   (done using)
 
     buf[4] = '\0';
-    printf("received %s\n", buf);
+    printf("%d: received %s\n", getpid(), buf);
   } else {
     close(p1[1]);             // close parent write (not using)
     close(p2[0]);             // close child read (not using)
@@ -33,7 +33,7 @@ main(int argc, char **argv)
     close(p1[0]);             // close parent read (done using)
 
     buf[4] = '\0';
-    printf("received %s\n", buf);
+    printf("%d: received %s\n", getpid(), buf);
 
     write(p2[1], "pong", 4);  // write to parent
     close(p2[1]);             // close child write (done using)
