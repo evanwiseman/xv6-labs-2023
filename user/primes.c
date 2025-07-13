@@ -27,7 +27,7 @@ main(int argc, char **argv)
       exit(0);  // no numbers to read
     }
 
-    printf("prime %d", val);
+    printf("prime %d\n", val);
 
     int right_pipe[2];
     pipe(right_pipe);
