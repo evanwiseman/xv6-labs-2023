@@ -40,7 +40,7 @@ void filter(int input[]) {
     dup(output[0]);
     close(output[0]);
 
-    char *argv[] = {"filter", 0};
+    char *argv[] = {"primes", 0};
     exec(argv[0], argv);
 
     fprintf(2, "exec failed\n");
