@@ -34,6 +34,7 @@ exec_pipe(int fd) {
     close(fd);
     exec_pipe(p[0]);
     close(p[0]);
+    exit(0);
   } else {
     // all work done in parent
     // wait for children to finish
@@ -41,9 +42,8 @@ exec_pipe(int fd) {
     close(p[0]);
     close(fd);
     wait(0);
+    exit(0);
   }
-
-  exit(0);
 }
 
 int
