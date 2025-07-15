@@ -6,7 +6,7 @@
 void 
 exec_pipe(int fd) {
   int prime;
-  if(read(fd, &prime, 4) != 4) {
+  if (read(fd, &prime, 4) != 4) {
     close(fd);
     return;
   }
@@ -25,6 +25,7 @@ exec_pipe(int fd) {
       write(p[1], &num, 4);
     }
   }
+  
   close(p[1]);
 
   int pid = fork();
@@ -34,13 +35,11 @@ exec_pipe(int fd) {
     close(fd);
     exec_pipe(p[0]);
     close(p[0]);
-    exit(0);
   } else {
     // all work done in parent
     close(p[0]);
     close(fd);
     wait(0);
-    exit(0);
   }
 }
 
@@ -57,12 +56,10 @@ main(int argc, char **argv) {
       write(p[1], &i, 4);
     }
     close(p[1]);
-    exit(0);
   } else {
     close(p[1]);
     exec_pipe(p[0]);
     close(p[0]);
-    exit(0);
   }
   
 }
