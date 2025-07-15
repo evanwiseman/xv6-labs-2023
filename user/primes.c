@@ -8,7 +8,6 @@ exec_pipe(int fd) {
   int prime;
   if(read(fd, &prime, 4) != 4) {
     close(fd);
-    exit(0);
     return;
   }
 
@@ -38,10 +37,10 @@ exec_pipe(int fd) {
     exit(0);
   } else {
     // all work done in parent
-    // wait for children to finish
     close(p[1]);
     close(p[0]);
     close(fd);
+    wait(0);
     exit(0);
   }
 }
@@ -64,7 +63,6 @@ main(int *argc, char **argv) {
     close(p[1]);
     exec_pipe(p[0]);
     close(p[0]);
-    wait(0);
     exit(0);
   }
   
