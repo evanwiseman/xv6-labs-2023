@@ -51,15 +51,21 @@ main(int *argc, char **argv) {
   // build left pipe
   int p[2];
   pipe(p);
-  for (int i = 2; i < 35; i++) {
-    write(p[1], &i, 4);
+  
+  int pid = fork();
+  if (pid == 0) {
+    close(p[0]);
+    for (int i = 2; i < 35; i++) {
+      write(p[1], &i, 4);
+    }
+    close(p[1]);
+    exit(0);
+  } else {
+    close(p[1]);
+    exec_pipe(p[0]);
+    close(p[0]);
+    wait(0);
+    exit(0);
   }
   
-  close(p[1]);
-
-  // find primes
-  exec_pipe(p[0]);
-  close(p[0]);
-
-  exit(0);
 }
