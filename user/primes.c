@@ -25,19 +25,18 @@ exec_pipe(int fd) {
       write(p[1], &num, 4);
     }
   }
+  close(p[1]);
 
   int pid = fork();
   if (pid == 0) { 
     // close file descriptors
     // execute on right pipe
-    close(p[1]);
     close(fd);
     exec_pipe(p[0]);
     close(p[0]);
     exit(0);
   } else {
     // all work done in parent
-    close(p[1]);
     close(p[0]);
     close(fd);
     wait(0);
@@ -63,7 +62,6 @@ main(int argc, char **argv) {
     close(p[1]);
     exec_pipe(p[0]);
     close(p[0]);
-    wait(0);
     exit(0);
   }
   
