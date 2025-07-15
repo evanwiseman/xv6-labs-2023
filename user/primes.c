@@ -40,7 +40,6 @@ exec_pipe(int fd) {
     close(p[1]);
     close(p[0]);
     close(fd);
-    wait(0);
     exit(0);
   }
 }
@@ -63,6 +62,7 @@ main(int *argc, char **argv) {
     close(p[1]);
     exec_pipe(p[0]);
     close(p[0]);
+    wait(0);
     exit(0);
   }
   
