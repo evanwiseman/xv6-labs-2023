@@ -42,7 +42,6 @@ exec_pipe(int fd) {
     close(p[1]);
     close(p[0]);
     close(fd);
-    wait(0);
     exit(0);
   }
 }
