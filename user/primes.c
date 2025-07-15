@@ -40,12 +40,13 @@ exec_pipe(int fd) {
     close(p[1]);
     close(p[0]);
     close(fd);
+    wait(0);
     exit(0);
   }
 }
 
 int
-main(int *argc, char **argv) {
+main(int argc, char **argv) {
   // build left pipe
   int p[2];
   pipe(p);
