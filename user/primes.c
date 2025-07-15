@@ -8,6 +8,7 @@ exec_pipe(int fd) {
   int prime;
   if(read(fd, &prime, 4) != 4) {
     close(fd);
+    exit(0);
     return;
   }
 
